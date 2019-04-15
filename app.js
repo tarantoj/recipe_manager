@@ -9,6 +9,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var recipeRouter = require('./routes/recipe');
 
+require('./models/db');
+
 var app = express();
 
 // view engine setup

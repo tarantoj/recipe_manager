@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  h1 #{recipe.title}
+  if recipe.author
+    p #[strong By] #{recipe.author}
+  else
+    p #[em Unknown Author]
+
+
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Ingredients
+    
+    dl
+      each i in recipe.ingredients
+        li= i
+
+      else
+        p This recipe has no ingredients.
+
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Method
+    
+    dl
+      each i in recipe.method
+        li= i
+
+      else
+        p This recipe has no method.

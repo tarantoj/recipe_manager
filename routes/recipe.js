@@ -3,7 +3,7 @@ var router = express.Router();
 
 var recipe_controller = require('../controllers/recipeController');
 
-router.get('/', recipe_controller.recipe_list)
+router.get('/', recipe_controller.index);
 
 router.get('/recipe/create', recipe_controller.recipe_create_get);
 

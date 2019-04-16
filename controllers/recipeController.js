@@ -37,8 +37,8 @@ exports.recipe_detail = function(req, res, next) {
 };
 
 // Display Author create form on GET.
-exports.recipe_create_get = function(req, res, next) {
-    res.render('recipe_form', { title: 'Create Recipe'});
+exports.recipe_create_get = function(req, res) {
+        res.render('recipe_form', { title: 'Create Recipe' });
 };
 
 
@@ -46,17 +46,28 @@ exports.recipe_create_post = [
 
     (req, res, next) => {
         if(!(req.body.ingredients instanceof Array)){
-            if(typeof req.body.ingredeients==='undefined')
+            if(typeof req.body.ingredients==='undefined')
             req.body.ingredients=[];
             else
-            req.body.ingredients=new Array(req.body.ingredients.split('\n'));
+            req.body.ingredients=req.body.ingredients.split('\r\n');
+        }
+        next();
+    },
+    (req, res, next) => {
+        if(!(req.body.method instanceof Array)){
+            if(typeof req.body.method==='undefined')
+            req.body.method=[];
+            else
+            req.body.method=req.body.method.split('\r\n');
         }
         next();
     },
     
     body('title', 'Recipe title required').isLength({ min: 1 }).trim(),
 
-    sanitizeBody('title').escape(),
+    sanitizeBody('*').escape(),
+    sanitizeBody('method').escape(),
+    sanitizeBody('ingredients').escape(),
 
     (req, res, next) => {
         const errors =  validationResult(req);
@@ -74,19 +85,21 @@ exports.recipe_create_post = [
         })
     }
 ]
-// Handle Author create on POST.
-exports.recipe_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Recipe create POST');
-};
+
 
 // Display Author delete form on GET.
 exports.recipe_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Recipe delete GET');
+    Recipe.findByIdAndRemove(req.body.id);
+    res.redirect('cookbook');
 };
 
 // Handle Recipe delete on POST.
-exports.recipe_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Recipe delete POST');
+exports.recipe_delete_post = function(req, res, next) {
+    Recipe.findByIdAndDelete(req.body.id, function (err, result) {
+        console.log("deleted: "+ result);
+        res.redirect('/cookbook');
+        if (err) { return next(err) };
+    });
 };
 
 // Display Author update form on GET.

@@ -29,3 +29,10 @@ block content
 
       else
         p This recipe has no method.
+
+  div(style='margin-left:20px;margin-top:20px')
+    form(method='POST' action='/cookbook/recipe/' + recipe._id + '/delete')
+      div.form-group
+        input#id.form-control(type='hidden',name='id', required='true', value=recipe._id )
+
+        button.btn.btn-primary(type='submit') Delete

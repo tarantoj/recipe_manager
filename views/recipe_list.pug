@@ -6,8 +6,11 @@ block content
   ul
     each recipe in recipe_list
       li 
-        a(href=recipe.url) #{recipe.title} 
-        |  (#{recipe.author})
+        if recipe.title
+          a(href=recipe.url) #{recipe.title} 
+          |  (#{recipe.author})
+        else
+          a(href=recipe.url) #[em No name]
 
     else
-      li There are no books.
+      li There are no recipes.

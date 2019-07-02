@@ -4,18 +4,24 @@ block content
   h1= title
 
   form(method='POST' action='')
-    div.form-group
+    .form-group
       label(for='title') Title:
       input#title.form-control(type='text', placeholder='Name of recipe' name='title' required='true' value=(undefined===recipe ? '' : recipe.title) )
-    div.form-group
+    .form-group
       label(for='author') Author:
       input#author.form-control(type='text', placeholder='Name of author' name='author' required='true' value=(undefined===recipe ? '' : recipe.author) )
-    div.form-group
+    .form-group
+      label(for='serves') Serves:
+      input#serves.form-control(type='number', placeholder='4' name='serves' required='true' value=(undefined===recipe ? 4 : recipe.serves) )
+    .form-group
+      label(for='description') Description:
+      textarea#description.form-control(placeholder='Description', rows='3' name='description' required='true')=(undefined===recipe ? '' : recipe.description)
+    .form-group
       label(for='ingredients') Ingredients:
-      textarea#ingredients.form-control(placeholder='Ingredients', rows='5' name='ingredients' value=(undefined===recipe ? '' : recipe.ingredients) required='true')
-    div.form-group
+      textarea#ingredients.form-control(placeholder='Ingredients', rows='5' name='ingredients' required='true')=(undefined===recipe ? '' : recipe.ingredients.join('\n'))
+    .form-group
       label(for='method') Method:
-      textarea#method.form-control(placeholder='Method', rows='5' name='method' value=(undefined===recipe ? '' : recipe.method) required='true')
+      textarea#method.form-control(placeholder='Method', rows='5' name='method', required='true')=(undefined===recipe ? '' : recipe.method.join('\n'))
     button.btn.btn-primary(type='submit') Submit
 
   if errors 

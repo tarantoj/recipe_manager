@@ -3,36 +3,30 @@ extends layout
 block content
   h1 #{recipe.title}
   if recipe.author
-    p #[strong By] #{recipe.author}
+    p #[em #{recipe.author}]
   else
     p #[em Unknown Author]
 
 
-  div(style='margin-left:20px;margin-top:20px')
-
-    h4 Ingredients
-    
-    dl
+  .card
+    .card-body
+      h5.card-title Ingredients
+      h6.card-subtitle.mb-2.text-muted Check the ingredients you have
       each i in recipe.ingredients
-        li= i
+        .form-check
+          input#check.form-check-input(type='checkbox', value='')
+          label.form-check-label(for=i)
+          | #{i}
 
-      else
-        p This recipe has no ingredients.
+  .card
+    .card-body
+      h5.card-title Method
+      ol
+        each i in recipe.method
+          li= i
 
-  div(style='margin-left:20px;margin-top:20px')
-
-    h4 Method
-    
-    dl
-      each i in recipe.method
-        li= i
-
-      else
-        p This recipe has no method.
-
-  div(style='margin-left:20px;margin-top:20px')
-    form(method='POST' action='/cookbook/recipe/' + recipe._id + '/delete')
-      div.form-group
-        input#id.form-control(type='hidden',name='id', required='true', value=recipe._id )
-
-        button.btn.btn-primary(type='submit') Delete
+  .btn-group(role='group')
+    a.btn.btn-outline-primary(role='button' href='#') Save
+    a.btn.btn-outline-success(role='button' href='#') Cook
+    a.btn.btn-outline-secondary(href='/cookbook/recipe/' + recipe._id + '/update') Edit
+    a.btn.btn-outline-danger(href='/cookbook/recipe/' + recipe._id + '/delete') Delete

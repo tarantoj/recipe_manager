@@ -3,14 +3,12 @@ extends layout
 block content
   h1= title
   
-  ul
+  ul.list-group
     each recipe in recipe_list
-      li 
         if recipe.title
-          a(href=recipe.url) #{recipe.title} 
-          |  (#{recipe.author})
+          a.list-group-item.list-group-item-action(href=recipe.url) #{recipe.title} (#{recipe.author})
         else
-          a(href=recipe.url) #[em No name]
+          a.list-group-item.list-group-item-action(href=recipe.url) #[em No name]
 
     else
       li There are no recipes.

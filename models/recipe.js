@@ -14,7 +14,7 @@ var RecipeSchema = new Schema({
 RecipeSchema
 .virtual('url')
 .get(function () {
-  return '/cookbook/recipe/' + this._id;
+  return `/cookbook/recipe/${this._id}`;
 });
 
 module.exports = mongoose.model('Recipe', RecipeSchema);

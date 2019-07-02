@@ -1,20 +1,19 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
-var RecipeSchema = new Schema({
-    title: {type: String, required: true, max: 100},
-    author: String,
-    method: {type: [String], required: true},
-    ingredients: {type: [String], require: true},
-    serves: Number
+const RecipeSchema = new Schema({
+  title: { type: String, required: true, max: 100 },
+  author: String,
+  method: { type: [String], required: true },
+  ingredients: { type: [String], require: true },
+  serves: Number,
 
 });
 
 RecipeSchema
-.virtual('url')
-.get(function () {
-  return `/cookbook/recipe/${this._id}`;
-});
+  .virtual('url')
+  // eslint-disable-next-line no-underscore-dangle
+  .get(() => `/cookbook/recipe/${this._id}`);
 
 module.exports = mongoose.model('Recipe', RecipeSchema);

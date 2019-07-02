@@ -1,12 +1,11 @@
 extends layout
 
 block content
-  h1 #{recipe.title}
+  h1.text-center #{recipe.title}
   if recipe.author
-    p #[em #{recipe.author}]
+    p.text-center #[em #{recipe.author}]
   else
-    p #[em Unknown Author]
-
+    p.text-center #[em Unknown Author]
 
   .card
     .card-body

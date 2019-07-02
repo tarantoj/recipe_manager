@@ -8,12 +8,13 @@ const RecipeSchema = new Schema({
   method: { type: [String], required: true },
   ingredients: { type: [String], require: true },
   serves: Number,
-
 });
 
 RecipeSchema
   .virtual('url')
   // eslint-disable-next-line no-underscore-dangle
-  .get(() => `/cookbook/recipe/${this._id}`);
+  .get(function url() {
+    return `/cookbook/recipe/${this.id}`;
+  });
 
 module.exports = mongoose.model('Recipe', RecipeSchema);

@@ -1,7 +1,5 @@
-$('.delete').click(function () {
-    var id = (this).attr("id");
-    if (confirm("Are you sure?")) {
-        console.log(id);
-        // do delete; use var id to delete data
+function deleteRecipe(id) {
+  if(confirm("Are you sure you want to delete this recipe?")) {
+    //Delete
   }
-});
+}

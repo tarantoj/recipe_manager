@@ -11,7 +11,7 @@ exports.index = (req, res) => {
       Recipe.countDocuments({}, callback);
     },
   }, (err, results) => {
-    res.render('index', { title: 'Cookbook: Home', error: err, data: results });
+    res.render('index', { title: 'Home', error: err, data: results });
   });
 };
 
@@ -19,7 +19,7 @@ exports.recipe_list = (req, res, next) => {
   Recipe.find({}, 'title author')
     .exec((err, ListRecipes) => {
       if (err) { return next(err); }
-      res.render('recipe_list', { title: 'Cookbook: Recipe List', recipe_list: ListRecipes });
+      res.render('recipe_list', { title: 'Recipe List', recipe_list: ListRecipes });
     });
 };
 
@@ -31,13 +31,13 @@ exports.recipe_detail = (req, res, next) => {
       error.status = 404;
       return next(error);
     }
-    res.render('recipe_detail', { title: `Cookbook: ${recipe.title}`, recipe });
+    res.render('recipe_detail', { title: `${recipe.title}`, recipe });
   });
 };
 
 // Display Author create form on GET.
 exports.recipe_create_get = (req, res) => {
-  res.render('recipe_form', { title: 'Cookbook: Create Recipe' });
+  res.render('recipe_form', { title: 'Create Recipe' });
 };
 
 
@@ -115,7 +115,7 @@ exports.recipe_update_get = (req, res) => {
       error.status = 404;
       return next(error);
     }
-    res.render('recipe_form', { title: `Cookbook: Edit ${recipe.title}`, recipe });
+    res.render('recipe_form', { title: `Edit ${recipe.title}`, recipe });
   });
 };
 
@@ -125,7 +125,7 @@ exports.recipe_update_post = (req, res) => {
 };
 
 exports.recipe_import_get = (req, res) => {
-  res.render('recipe_import', { title: 'Cookbook: Recipe Import' });
+  res.render('recipe_import', { title: 'Recipe Import' });
 };
 
 exports.recipe_import_post = (req, res) => {

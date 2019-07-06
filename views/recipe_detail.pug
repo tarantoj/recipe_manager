@@ -34,5 +34,5 @@ block content
   .btn-group(role='group')
     a.btn.btn-outline-primary(role='button' href='#') Save
     a.btn.btn-outline-success(role='button' href='#') Cook
-    a.btn.btn-outline-secondary(href='/cookbook/recipe/' + recipe._id + '/update') Edit
-    a.btn.btn-outline-danger(role='button', href='#', class='delete', id=recipe.id) Delete
+    a.btn.btn-outline-secondary(href='/cookbook/recipe/!{recipe._id}/update') Edit
+    a.btn.btn-outline-danger(role='button', onclick="deleteRecipe('" + recipe._id + "')" id=recipe.id) Delete

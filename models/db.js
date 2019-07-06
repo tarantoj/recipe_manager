@@ -10,7 +10,7 @@ const options = {
   dbName: 'test',
 };
 
-mongoose.connect(dbURI, options).then(
+mongoose.connect('mongodb://localhost/recipeman', options).then(
   () => {
     console.log('Database connection established!');
   },

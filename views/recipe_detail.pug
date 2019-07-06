@@ -1,11 +1,18 @@
 extends layout
 
+block append scripts
+  script(src='/javascript/recipe_detail.js')
+
 block content
   h1.text-center #{recipe.title}
   if recipe.author
     p.text-center #[em #{recipe.author}]
   else
     p.text-center #[em Unknown Author]
+
+  p #[em Serves:] #{recipe.serves}
+  p #{recipe.description}
+
 
   .card
     .card-body
@@ -28,4 +35,4 @@ block content
     a.btn.btn-outline-primary(role='button' href='#') Save
     a.btn.btn-outline-success(role='button' href='#') Cook
     a.btn.btn-outline-secondary(href='/cookbook/recipe/' + recipe._id + '/update') Edit
-    a.btn.btn-outline-danger(href='/cookbook/recipe/' + recipe._id + '/delete') Delete
+    a.btn.btn-outline-danger(role='button', href='#', class='delete', id=recipe.id) Delete

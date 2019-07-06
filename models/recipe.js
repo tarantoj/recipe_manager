@@ -12,7 +12,6 @@ const RecipeSchema = new Schema({
 
 RecipeSchema
   .virtual('url')
-  // eslint-disable-next-line no-underscore-dangle
   .get(function url() {
     return `/cookbook/recipe/${this.id}`;
   });

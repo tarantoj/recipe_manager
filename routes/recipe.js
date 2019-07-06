@@ -10,6 +10,10 @@ router.get('/recipe/create', recipeController.recipe_create_get);
 
 router.post('/recipe/create', recipeController.recipe_create_post);
 
+router.get('/recipe/import', recipeController.recipe_import_get);
+
+router.post('/recipe/import', recipeController.recipe_import_post);
+
 router.get('/recipe/:id/delete', recipeController.recipe_delete_get);
 
 router.post('/recipe/:id/delete', recipeController.recipe_delete_post);
@@ -21,5 +25,4 @@ router.post('/recipe/:id/update', recipeController.recipe_update_post);
 router.get('/recipe/:id', recipeController.recipe_detail);
 
 router.get('/recipes', recipeController.recipe_list);
-
 module.exports = router;

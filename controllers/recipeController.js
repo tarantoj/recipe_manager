@@ -1,6 +1,8 @@
 const async = require('async');
 const { body, validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
+const url = require('url');
+const request = require('request');
 const Recipe = require('../models/recipe');
 
 exports.index = (req, res) => {
@@ -91,8 +93,7 @@ exports.recipe_create_post = [
 
 // Display Author delete form on GET.
 exports.recipe_delete_get = (req, res) => {
-  Recipe.findByIdAndRemove(req.body.id);
-  res.redirect('/cookbook');
+  Recipe.findByIdAndRemove(req.body.id).then(res.redirect('/cookbook'));
 };
 
 // Handle Recipe delete on POST.
@@ -121,4 +122,30 @@ exports.recipe_update_get = (req, res) => {
 // Handle Author update on POST.
 exports.recipe_update_post = (req, res) => {
   res.send('NOT IMPLEMENTED: Recipe update POST');
+};
+
+exports.recipe_import_get = (req, res) => {
+  res.render('recipe_import', { title: 'Cookbook: Recipe Import' });
+};
+
+exports.recipe_import_post = (req, res) => {
+  const myUrl = url.parse(req.body.url);
+  const id = myUrl.path.match(/\/(\d+)\//)[1];
+  const jsonUrl = `https://www.woolworths.com.au/apis/ui/recipes/${id}`
+  request({
+    url: jsonUrl,
+    json: true,
+  }, (err, response, body) => {
+    if (!err && response.statusCode === 200) {
+      const importedRecipe = new Recipe({
+        title: body.Title,
+        author: 'Woolworths',
+        description: body.TextTip,
+        method: body.Instructions.split('\r\n').map(i => i.match(/(?:^\d. )(.*)/)[1]),
+        ingredients: body.Ingredients.map(i => i.Description),
+        serves: body.Servings,
+      });
+      importedRecipe.save().then(res.redirect(importedRecipe.url));
+    }
+  });
 };

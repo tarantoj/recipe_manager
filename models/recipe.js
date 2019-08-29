@@ -8,12 +8,20 @@ const RecipeSchema = new Schema({
   method: { type: [String], required: true },
   ingredients: { type: [String], require: true },
   serves: Number,
+  prepTime: Number,
+  cookTime: Number,
 });
 
 RecipeSchema
   .virtual('url')
   .get(function url() {
     return `/cookbook/recipe/${this.id}`;
+  });
+
+RecipeSchema
+  .virtual('totalTime')
+  .get(function totalTime() {
+    return (this.prepTime + this.cookTime);
   });
 
 module.exports = mongoose.model('Recipe', RecipeSchema);

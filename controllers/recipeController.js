@@ -1,25 +1,21 @@
 const async = require('async');
 const { body, validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
-const url = require('url');
-const request = require('request');
 const Recipe = require('../models/recipe');
+const woolworths = require('../lib/woolworths');
 
-exports.index = (req, res) => {
-  async.parallel({
-    recipe_count(callback) {
-      Recipe.countDocuments({}, callback);
-    },
-  }, (err, results) => {
-    res.render('index', { title: 'Home', error: err, data: results });
+exports.index = (req, res, next) => {
+  Recipe.countDocuments({}, (err, count) => {
+    if (!err) res.render('index', { title: 'Home', count });
+    else next(err);
   });
 };
 
 exports.recipe_list = (req, res, next) => {
   Recipe.find({}, 'title author')
-    .exec((err, ListRecipes) => {
-      if (err) { return next(err); }
-      res.render('recipe_list', { title: 'Recipe List', recipe_list: ListRecipes });
+    .exec((err, recipes) => {
+      if (err) return next(err);
+      res.render('recipe_list', { title: 'Recipe List', recipes });
     });
 };
 
@@ -40,29 +36,26 @@ exports.recipe_create_get = (req, res) => {
   res.render('recipe_form', { title: 'Create Recipe' });
 };
 
+function convertToArray(input) {
+  let output = [];
+  if (!(input instanceof Array)) {
+    if (typeof input === 'undefined') {
+      output = [];
+    } else {
+      output = input.split('\r\n');
+      output = output.filter(el => el.trim().length !== 0);
+    }
+  }
+  return output;
+}
 
 exports.recipe_create_post = [
-
   (req, res, next) => {
-    if (!(req.body.ingredients instanceof Array)) {
-      if (typeof req.body.ingredients === 'undefined') {
-        req.body.ingredients = [];
-      } else {
-        req.body.ingredients = req.body.ingredients.split('\r\n');
-        req.body.ingredients = req.body.ingredients.filter(el => el.trim().length !== 0);
-      }
-    }
+    req.body.ingredients = convertToArray(req.body.ingredients);
     next();
   },
   (req, res, next) => {
-    if (!(req.body.method instanceof Array)) {
-      if (typeof req.body.method === 'undefined') {
-        req.body.method = [];
-      } else {
-        req.body.method = req.body.method.split('\r\n');
-        req.body.method = req.body.method.filter(el => el.trim().length !== 0);
-      }
-    }
+    req.body.method = convertToArray(req.body.method);
     next();
   },
 
@@ -83,31 +76,27 @@ exports.recipe_create_post = [
         serves: req.body.serves,
       },
     );
-    recipe.save((err) => {
-      if (err) { return next(err); }
-      res.redirect(recipe.url);
-    });
+    if (!errors.isEmpty()) {
+      next(errors);
+    } else {
+      recipe.save((err) => {
+        if (err) { return next(err); }
+        res.redirect(recipe.url);
+      });
+    }
   },
 ];
 
-
-// Display Author delete form on GET.
-exports.recipe_delete_get = (req, res) => {
-  Recipe.findByIdAndRemove(req.body.id).then(res.redirect('/cookbook'));
-};
-
 // Handle Recipe delete on POST.
 exports.recipe_delete_post = (req, res, next) => {
-  Recipe.findByIdAndDelete(req.body.id, (err, result) => {
-    // eslint-disable-next-line no-console
-    console.log(`deleted: ${result}`);
+  Recipe.deleteOne({ _id: req.body.id }, (err) => {
+    if (err) next(err);
     res.redirect('/cookbook');
-    if (err) { return next(err); }
   });
 };
 
 // Display Author update form on GET.
-exports.recipe_update_get = (req, res) => {
+exports.recipe_update_get = (req, res, next) => {
   Recipe.findById(req.params.id, (err, recipe) => {
     if (err) { return next(err); }
     if (recipe == null) {
@@ -128,24 +117,14 @@ exports.recipe_import_get = (req, res) => {
   res.render('recipe_import', { title: 'Recipe Import' });
 };
 
-exports.recipe_import_post = (req, res) => {
-  const myUrl = url.parse(req.body.url);
-  const id = myUrl.path.match(/\/(\d+)\//)[1];
-  const jsonUrl = `https://www.woolworths.com.au/apis/ui/recipes/${id}`
-  request({
-    url: jsonUrl,
-    json: true,
-  }, (err, response, body) => {
-    if (!err && response.statusCode === 200) {
-      const importedRecipe = new Recipe({
-        title: body.Title,
-        author: 'Woolworths',
-        description: body.TextTip,
-        method: body.Instructions.split('\r\n').map(i => i.match(/(?:^\d. )(.*)/)[1]),
-        ingredients: body.Ingredients.map(i => i.Description),
-        serves: body.Servings,
-      });
-      importedRecipe.save().then(res.redirect(importedRecipe.url));
-    }
-  });
-};
+exports.recipe_import_post = [
+  woolworths.importRecipe,
+  (req, res, next) => {
+    Recipe.create(req.recipe, (err, recipe) => {
+      if (err) next(err);
+      else {
+        res.redirect(recipe.url);
+      }
+    });
+  },
+];

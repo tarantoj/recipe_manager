@@ -14,8 +14,6 @@ router.get('/recipe/import', recipeController.recipe_import_get);
 
 router.post('/recipe/import', recipeController.recipe_import_post);
 
-router.get('/recipe/:id/delete', recipeController.recipe_delete_get);
-
 router.post('/recipe/:id/delete', recipeController.recipe_delete_post);
 
 router.get('/recipe/:id/update', recipeController.recipe_update_get);

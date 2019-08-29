@@ -4,7 +4,7 @@ block content
   h1= title
   
   ul.list-group
-    each recipe in recipe_list
+    each recipe in recipes
         if recipe.title
           a.list-group-item.list-group-item-action(href=recipe.url) #{recipe.title} (#{recipe.author})
         else

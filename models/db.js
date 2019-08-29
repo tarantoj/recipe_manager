@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
 const mongoose = require('mongoose');
 
-const ATLAS_USER = process.env.ATLAS_USER || '';
-const ATLAS_PASS = process.env.ATLAS_PASS || '';
-const dbURI = process.env.MONGO_DB_URL || `mongodb+srv://${ATLAS_USER}:${ATLAS_PASS}@cluster0-grx4h.mongodb.net/test?retryWrites=true&w=majority`;
+const { MONGODB_HOST, MONGODB_USER, MONGODB_PASS } = process.env;
+
+const dbURI = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASS}@${MONGODB_HOST}`;
 
 const options = {
   useNewUrlParser: true,
-  dbName: 'test',
+  dbName: 'recipeman',
 };
 
 mongoose.connect(dbURI, options).then(

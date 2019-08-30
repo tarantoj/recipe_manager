@@ -9,13 +9,19 @@ block content
       input#title.form-control(type='text', placeholder='Name of recipe' name='title' required='true' value=(undefined===recipe ? '' : recipe.title) )
     .form-group
       label(for='author') Author:
-      input#author.form-control(type='text', placeholder='Name of author' name='author' required='true' value=(undefined===recipe ? '' : recipe.author) )
+      input#author.form-control(type='text', placeholder='Name of author' name='author' required='false' value=(undefined===recipe ? '' : recipe.author) )
     .form-group
       label(for='serves') Serves:
       input#serves.form-control(type='number', placeholder='4' name='serves' required='true' value=(undefined===recipe ? 4 : recipe.serves) )
     .form-group
+      label(for='prepTime') Preparation Time:
+      input#serves.form-control(type='number', placeholder='4' name='prepTime' required='false' value=(undefined===recipe ? 4 : recipe.prepTime) )
+    .form-group
+      label(for='cookTime') Cooking Time:
+      input#serves.form-control(type='number', placeholder='4' name='cookTime' required='false' value=(undefined===recipe ? 4 : recipe.cookTime) )    
+    .form-group
       label(for='description') Description:
-      textarea#description.form-control(placeholder='Description', rows='3' name='description' required='true')=(undefined===recipe ? '' : recipe.description)
+      textarea#description.form-control(placeholder='Description', rows='3' name='description' required='false')=(undefined===recipe ? '' : recipe.description)
     .form-group
       label(for='ingredients') Ingredients:
       textarea#ingredients.form-control(placeholder='Ingredients', rows='5' name='ingredients' required='true')=(undefined===recipe ? '' : recipe.ingredients.join('\n'))

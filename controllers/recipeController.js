@@ -1,4 +1,3 @@
-const async = require('async');
 const { body, validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 const Recipe = require('../models/recipe');
@@ -14,7 +13,7 @@ exports.index = (req, res, next) => {
 exports.recipe_list = (req, res, next) => {
   Recipe.find({}, 'title author')
     .exec((err, recipes) => {
-      if (err) return next(err);
+      if (err) next(err);
       res.render('recipe_list', { title: 'Recipe List', recipes });
     });
 };
@@ -74,6 +73,9 @@ exports.recipe_create_post = [
         method: req.body.method,
         ingredients: req.body.ingredients,
         serves: req.body.serves,
+        description: req.body.description,
+        prepTime: req.body.prepTime,
+        cookTime: req.body.cookTime,
       },
     );
     if (!errors.isEmpty()) {
@@ -109,9 +111,47 @@ exports.recipe_update_get = (req, res, next) => {
 };
 
 // Handle Author update on POST.
-exports.recipe_update_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: Recipe update POST');
-};
+exports.recipe_update_post = [
+  (req, res, next) => {
+    req.body.ingredients = convertToArray(req.body.ingredients);
+    next();
+  },
+  (req, res, next) => {
+    req.body.method = convertToArray(req.body.method);
+    next();
+  },
+
+  body('title', 'Recipe title required').isLength({ min: 1 }).trim(),
+
+  sanitizeBody('*').escape(),
+  sanitizeBody('method').escape(),
+  sanitizeBody('ingredients').escape(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    const recipe = new Recipe(
+      {
+        title: req.body.title,
+        author: req.body.author,
+        method: req.body.method,
+        ingredients: req.body.ingredients,
+        serves: req.body.serves,
+        _id: req.body.id,
+        description: req.body.description,
+        prepTime: req.body.prepTime,
+        cookTime: req.body.cookTime,
+      },
+    );
+    if (!errors.isEmpty()) {
+      next(errors);
+    } else {
+      recipe.save((err) => {
+        if (err) { return next(err); }
+        res.redirect(recipe.url);
+      });
+    }
+  },
+];
 
 exports.recipe_import_get = (req, res) => {
   res.render('recipe_import', { title: 'Recipe Import' });

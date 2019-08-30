@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 const mongoose = require('mongoose');
 
-const { MONGODB_HOST, MONGODB_USER, MONGODB_PASS } = process.env;
+const { MONGODB_URI } = process.env;
 
-const dbURI = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASS}@${MONGODB_HOST}`;
+const dbURI = MONGODB_URI;
 
 const options = {
   useNewUrlParser: true,

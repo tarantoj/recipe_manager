@@ -9,30 +9,34 @@ block content
     p.text-center #[em #{recipe.author}]
   else
     p.text-center #[em Unknown Author]
-
-  p #[em Serves:] #{recipe.serves}
   p #{recipe.description}
 
+  .row
+    .col
+      .card
+        .card-body
+          h5.card-title Ingredients
+          h6.card-subtitle.mb-2.text-muted Check off the ingredients you have
+          each i in recipe.ingredients
+            .form-check.mb-2
+              input#check.form-check-input(type='checkbox', value='')
+              label.form-check-label(for=i)
+              | #{i}
+          .input-group
+            input.form-control(type='number', name='serves' value=(undefined===recipe ? 4 : recipe.serves))
+            .input-group-append
+              span#basic-addon2.input-group-text Serves
 
-  .card
-    .card-body
-      h5.card-title Ingredients
-      h6.card-subtitle.mb-2.text-muted Check the ingredients you have
-      each i in recipe.ingredients
-        .form-check
-          input#check.form-check-input(type='checkbox', value='')
-          label.form-check-label(for=i)
-          | #{i}
-
-  .card
-    .card-body
-      h5.card-title Method
-      ol
-        each i in recipe.method
-          li= i
-
-  .btn-group(role='group')
-    a.btn.btn-outline-primary(role='button' href='#') Save
-    a.btn.btn-outline-success(role='button' href='#') Cook
-    a.btn.btn-outline-secondary(href=recipe.id + '/update') Edit
-    a.btn.btn-outline-danger(role='button', onclick="deleteRecipe('" + recipe.id + "')" id=recipe.id) Delete
+    .col
+      .card
+        .card-body
+          h5.card-title Method
+          ul.list-group.list-group-flush
+            each i in recipe.method
+              li.list-group-item= i
+  .row
+    .btn-group(role='group')
+      a.btn.btn-outline-primary(role='button' href='#') Save
+      a.btn.btn-outline-success(role='button' href='#') Cook
+      a.btn.btn-outline-secondary(href=recipe.id + '/update') Edit
+      a.btn.btn-outline-danger(role='button', onclick="deleteRecipe('" + recipe.id + "')" id=recipe.id) Delete

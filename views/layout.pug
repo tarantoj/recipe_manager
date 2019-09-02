@@ -11,7 +11,7 @@ html(lang='en')
       script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js')
   body
     nav.navbar.navbar-expand-lg.navbar-light.bg-light
-      a.navbar-brand Cookbook
+      a.navbar-brand(href='/') Cookbook
       button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNavAltMarkup', aria-controls='navbarNavAltMarkup', aria-expanded='false', aria-label='Toggle navigation')
         span.navbar-toggler-icon
       #navbarNavAltMarkup.collapse.navbar-collapse
@@ -22,8 +22,10 @@ html(lang='en')
           a.nav-item.nav-link(href='/cookbook/recipes') Recipes
           a.nav-item.nav-link(href='/cookbook/recipe/create') Add Recipe
           a.nav-item.nav-link(href='/cookbook/recipe/import') Import Recipe
+          if locals.profile
+            a.nav-item.nav-link(href=locals.logout) Logout
+          else
+            a.nav-item.nav-link(href=locals.login) Login
 
     .container
-        .row
-          .col-md-10.offset-md-1
-            block content
+      block content

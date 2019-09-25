@@ -22,5 +22,7 @@ router.post('/recipe/:id/update', recipeController.recipe_update_post);
 
 router.get('/recipe/:id', recipeController.recipe_detail);
 
+router.get('/recipe/:id/add', recipeController.recipe_add_to_list);
+
 router.get('/recipes', recipeController.recipe_list);
 module.exports = router;

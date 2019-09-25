@@ -5,3 +5,9 @@ function deleteRecipe(id) {
     });
   }
 }
+
+function addRecipe(id) {
+  $.post(`/cookbook/recipe/${id}/add`, { id }, (data, status) => {
+    alert("Recipe saved");
+  });
+}

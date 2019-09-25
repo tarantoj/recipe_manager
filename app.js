@@ -9,18 +9,18 @@ const sassMiddleware = require('node-sass-middleware');
 const passport = require('passport');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-const indexRouter = require('./routes/index');
-const userRouter = require('./routes/user');
-const recipeRouter = require('./routes/recipe');
-
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
-const db = require('./models/db');
+require('./models/db');
+
+const indexRouter = require('./routes/index');
+const userRouter = require('./routes/user');
+const recipeRouter = require('./routes/recipe');
 
 const sessionConfig = {
-  secret: 'super-secret', // change soon
+  secret: process.env.SESSION_SECRET, // change soon
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
   },

@@ -20,8 +20,8 @@ block content
           each i in recipe.ingredients
             .form-check.mb-2
               input#check.form-check-input(type='checkbox', value='')
-              label.form-check-label(for=i)
-              | #{i}
+              label.form-check-label(for=i.text)
+              | #{i.text}
           .input-group
             input.form-control(type='number', name='serves' value=(undefined===recipe ? 4 : recipe.serves))
             .input-group-append
@@ -36,7 +36,7 @@ block content
               li.list-group-item= i
   .row
     .btn-group(role='group')
-      a.btn.btn-outline-primary(role='button' href='#') Save
+      a.btn.btn-outline-primary(role='button' onclick=`addRecipe('${recipe.id}')`) Save
       a.btn.btn-outline-success(role='button' href='#') Cook
-      a.btn.btn-outline-secondary(href=recipe.id + '/update') Edit
+      a.btn.btn-outline-secondary(href=`/${recipe.id}/update`) Edit
       a.btn.btn-outline-danger(role='button', onclick="deleteRecipe('" + recipe.id + "')" id=recipe.id) Delete

@@ -1,7 +1,12 @@
 const { body, validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
+const async = require('async');
+const ingredientParser = require('recipe-ingredient-parser-v2');
+
 const Recipe = require('../models/recipe');
+const User = require('../models/user');
 const woolworths = require('../lib/woolworths');
+const oauth2 = require('../lib/oauth2');
 
 exports.index = (req, res, next) => {
   Recipe.countDocuments({}, (err, count) => {
@@ -20,11 +25,11 @@ exports.recipe_list = (req, res, next) => {
 
 exports.recipe_detail = (req, res, next) => {
   Recipe.findById(req.params.id, (err, recipe) => {
-    if (err) { return next(err); }
+    if (err) next(err);
     if (recipe == null) {
       const error = new Error('Recipe not found');
       error.status = 404;
-      return next(error);
+      next(error);
     }
     res.render('recipe_detail', { title: `${recipe.title}`, recipe });
   });
@@ -71,7 +76,7 @@ exports.recipe_create_post = [
         title: req.body.title,
         author: req.body.author,
         method: req.body.method,
-        ingredients: req.body.ingredients,
+        ingredients: req.body.ingredients.map(i => ({ originalText: i })),
         serves: req.body.serves,
         description: req.body.description,
         prepTime: req.body.prepTime,
@@ -82,8 +87,8 @@ exports.recipe_create_post = [
       next(errors);
     } else {
       recipe.save((err) => {
-        if (err) { return next(err); }
-        res.redirect(recipe.url);
+        if (err) next(err);
+        else res.redirect(recipe.url);
       });
     }
   },
@@ -100,11 +105,11 @@ exports.recipe_delete_post = (req, res, next) => {
 // Display Author update form on GET.
 exports.recipe_update_get = (req, res, next) => {
   Recipe.findById(req.params.id, (err, recipe) => {
-    if (err) { return next(err); }
+    if (err) next(err);
     if (recipe == null) {
       const error = new Error('Recipe not found');
       error.status = 404;
-      return next(error);
+      next(error);
     }
     res.render('recipe_form', { title: `Edit ${recipe.title}`, recipe });
   });
@@ -146,7 +151,7 @@ exports.recipe_update_post = [
       next(errors);
     } else {
       recipe.save((err) => {
-        if (err) { return next(err); }
+        if (err) next(err);
         res.redirect(recipe.url);
       });
     }
@@ -165,6 +170,37 @@ exports.recipe_import_post = [
       else {
         res.redirect(recipe.url);
       }
+    });
+  },
+];
+
+
+exports.recipe_add_to_list = [
+  oauth2.required,
+  (req, res, next) => {
+    async.parallel({
+      recipe: (cb) => {
+        Recipe.findById(req.params.id).exec(cb);
+      },
+      user: (cb) => {
+        User.findById(res.locals.profile.id).exec(cb);
+      },
+    }, (err, results) => {
+      if (err) next(err);
+      const { recipe, user } = results;
+      let combined = user.shopping_list.concat(recipe.ingredients);
+      combined = combined.map((i) => {
+        return {
+          ingredient: i.ingredient,
+          unit: i.unit,
+          quantity: i.quantity,
+        };
+      });
+      user.shopping_list = ingredientParser.combine(combined);
+      user.save((saveErr) => {
+        if (saveErr) next(saveErr);
+        res.redirect('/');
+      });
     });
   },
 ];

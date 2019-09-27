@@ -1,5 +1,8 @@
-const { body, validationResult } = require('express-validator/check');
-const { sanitizeBody } = require('express-validator/filter');
+const {
+  body,
+  validationResult,
+  sanitizeBody,
+} = require('express-validator');
 
 const Recipe = require('../models/recipe');
 const List = require('../models/list');
@@ -30,7 +33,6 @@ exports.recipe_detail = (req, res, next) => {
       error.status = 404;
       next(error);
     }
-    console.log(recipe);
     res.render('recipe_detail', { title: `${recipe.title}`, recipe });
   });
 };
@@ -118,15 +120,17 @@ exports.recipe_delete_post = [
 exports.recipe_update_get = [
   oauth2.required,
   (req, res, next) => {
-    Recipe.findById(req.params.id, (err, recipe) => {
-      if (err) next(err);
-      if (recipe == null) {
-        const error = new Error('Recipe not found');
-        error.status = 404;
-        next(error);
-      }
-      res.render('recipe_form', { title: `Edit ${recipe.title}`, recipe });
-    });
+    Recipe.findById(req.params.id)
+      .populate('ingredients')
+      .exec((err, recipe) => {
+        if (err) next(err);
+        if (recipe == null) {
+          const error = new Error('Recipe not found');
+          error.status = 404;
+          next(error);
+        }
+        res.render('recipe_form', { title: `Edit ${recipe.title}`, recipe });
+      });
   },
 ];
 

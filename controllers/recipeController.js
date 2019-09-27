@@ -4,7 +4,10 @@ const {
   sanitizeBody,
 } = require('express-validator');
 
+const async = require('async');
+
 const Recipe = require('../models/recipe');
+const User = require('../models/user');
 const List = require('../models/list');
 const woolworths = require('../lib/woolworths');
 const oauth2 = require('../lib/oauth2');
@@ -26,14 +29,28 @@ exports.recipe_list = (req, res, next) => {
 };
 
 exports.recipe_detail = (req, res, next) => {
-  Recipe.findById(req.params.id).populate('ingredients').exec((err, recipe) => {
+  async.parallel({
+    recipe: function recipe(done) {
+      Recipe
+        .findById(req.params.id)
+        .populate('ingredients')
+        .exec(done);
+    },
+    user: function user(done) {
+      if (res.locals.profile) {
+        User
+          .findById(res.locals.profile.id)
+          .populate('lists')
+          .exec(done);
+      } else done(null, null);
+    },
+  }, (err, results) => {
     if (err) next(err);
-    if (recipe == null) {
-      const error = new Error('Recipe not found');
-      error.status = 404;
-      next(error);
-    }
-    res.render('recipe_detail', { title: `${recipe.title}`, recipe });
+    res.render('recipe_detail', {
+      title: results.recipe.title,
+      recipe: results.recipe,
+      user: results.user,
+    });
   });
 };
 

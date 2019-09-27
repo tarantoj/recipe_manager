@@ -33,7 +33,7 @@ listSchema.virtual('url').get(function url() {
 })
 
 listSchema.methods.addItems = function addItems(toAdd, done) {
-  let combined = this.items.concat(toAdd.items);
+  let combined = this.items.concat(toAdd);
   combined = combined.map((i) => ({
     ingredient: i.ingredient,
     unit: i.unit,

@@ -1,21 +1,66 @@
 extends layout
 
+block append scripts
+  script(src='/javascript/user_home.js')
+
 block content
-  .py-1.text-center
-  h2.text-center Hi, #{locals.profile.display_name}
-  p.lead.text-center Here is everything on your shopping lists
+  .row
+    .col
+      h2.text-center Hi, #{locals.profile.display_name}
+      p.lead.text-center Here are your shopping lists
   if lists.length !== 0
-    .row
+    .row.justify-content-center
       each list in lists
-        .col
-          h4.d-flex.justify-content-between.align-items-center
-            span.text-muted #{list.name}
-            span.badge.badge-secondary.badge-pill #{list.items.length}
-          if list.items.length !== 0
-            .list-group
-              each i in list
-                a.list-group-item.list-group-item-action(href='#', data-id=i.id) #{i.text}
-    .row.py-3
-      button.btn.btn-danger.remove-items(type='button') Remove selected items from list
+        .col-md-auto.my-2
+          .card
+            .card-header.text-center #{list.name}
+              .float-right
+                button.btn.btn-outline-secondary.dropdown-toggle.dropdown-toggle-split.btn-sm(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
+                  span.sr-only Toggle dropdown
+                .dropdown-menu
+                  button.dropdown-item(type="button") Share
+                  button.dropdown-item(type="button") Edit
+                  button.dropdown-item(type="button", data-toggle="modal", data-target="#deleteListModal", data-listId=list.id, data-listName=list.name) Delete
+            ul.list-group
+              each item in list.items
+                a.list-group-item.list-group-item-action(name=`${list.id}-item` data-id=item.id) #{item.text}
+              else
+                li.list-group-item It's empty!
+            .card-footer.text-center
+              button.btn.btn-danger(type="button" name="removeItems" data-listid=list.id) Remove selected items
   else 
-    p There's nothing to buy!
+    .row
+      .col.text-center
+        p There's nothing to buy!
+  .row
+    .col
+      button.btn.btn-primary(type='button', data-toggle='modal', data-target='#createListModal') Create List
+  #createListModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+    .modal-dialog.modal-dialog-centered(role='document')
+      .modal-content
+        form(action="/user/list/create", method="post")
+          .modal-header
+            h5#exampleModalLabel.modal-title Create a list
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+              .form-group
+                label(for='name') List name
+                input#name.form-control(type='text', name='name', placeholder="Descriptive name for your list", required="true")
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+            button.btn.btn-primary(type='submit') Create
+  #deleteListModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+    .modal-dialog.modal-dialog-centered(role='document')
+      .modal-content
+        form(action="/user/list/delete", method="post")
+          .modal-header
+            h5#exampleModalLabel.modal-title Delete a list
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            p test
+            input#deleteListId.form-control(type='text', name='listId', required="true", value="", hidden)
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+            button.btn.btn-danger(type='submit') Delete

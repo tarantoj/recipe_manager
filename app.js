@@ -37,6 +37,12 @@ const sessionConfig = {
 
 
 const app = express();
+/* app.use((req, res, next) => {
+  res.on('header', () => {
+    console.trace('headers  written');
+  });
+  next();
+}); */
 
 app.use(session(sessionConfig));
 

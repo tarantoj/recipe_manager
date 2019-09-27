@@ -3,6 +3,22 @@ $(document).ready(() => {
     $(this).toggleClass('list-group-item-success');
   });
 
+  $("[name='addToList']").click(function addToList() {
+    const listId = $(this).data('listid');
+    const toAdd = $("[name='ingredient']")
+      .filter(function isNotSelected() {
+        return !$(this).hasClass('list-group-item-success');
+      })
+      .map(function getData() {
+        return $(this).data();
+      })
+      .get();
+
+    $.post('/user/list/add', { toAdd, listId }, (_data, status) => {
+      if (status === 'success') window.location.href = '/user';
+    });
+  });
+
   $('#add').click(() => {
     const toAdd = $("[name='ingredient']")
       .filter(function isNotSelected() {

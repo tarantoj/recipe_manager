@@ -43,7 +43,14 @@ block content
         each s in recipe.method
           li.list-group-item= s
   if locals.profile
-    .row.m-4
-      button.btn.btn-primary.m-1(type='button' id='add') Add to shopping list
-      a.btn.btn-secondary.m-1(role='button' href=`/cookbook/update/${recipe.id}`) Edit recipe
-      button.btn.btn-danger.m-1(type='button' href=`/cookbook/`) Delete recipe
+    .row
+      .col.my-2
+        .btn-group
+          button.btn.btn-primary.dropdown-toggle.mx-1(type='button' data-toggle='dropdown' aria-haspopup="true" aria-expanded="false") Add to list
+          .dropdown-menu
+            each list in user.lists
+              button.dropdown-item(type="button", name="addToList", data-listId=list.id) #{list.name}
+            else
+              a.dropdown-item(href='/user') Make a list first!
+        a.btn.btn-secondary.mx-1(role='button' href=`/recipe/update/${recipe.id}`) Edit recipe
+        button.btn.btn-danger.mx-1(type='button' href=`/cookbook/`) Delete recipe

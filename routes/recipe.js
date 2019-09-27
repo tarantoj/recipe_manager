@@ -13,8 +13,8 @@ router.get('/import', recipeController.recipe_import_get);
 router.post('/import', recipeController.recipe_import_post);
 
 router.post('/delete/:id', recipeController.recipe_delete_post);
-router.get('/update/:id', recipeController.recipe_update_get);
 
+router.get('/update/:id', recipeController.recipe_update_get);
 router.post('/update/:id', recipeController.recipe_update_post);
 
 router.get('/all', recipeController.recipe_list);

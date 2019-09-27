@@ -6,8 +6,12 @@ module.exports = {
     node: true,
     jquery: true,
   },
+  plugins: [
+    'jquery',
+  ],
   extends: [
     'airbnb-base',
+    'plugin:jquery/slim',
   ],
   globals: {
     Atomics: 'readonly',

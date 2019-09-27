@@ -1,0 +1,23 @@
+extends layout
+
+block append scripts
+  script(src='/javascript/shopping_list.js')
+
+
+block content
+  .py-1.text-center
+  h2.text-center Hi, #{locals.profile.display_name}
+  p.lead.text-center Here is your shopping list, generated from recipe's added to your profile
+  if locals.profile.shopping_list.length !== 0
+    .row
+      .col
+        h4.d-flex.justify-content-between.align-items-center
+          span.text-muted Your shopping list
+          span.badge.badge-secondary.badge-pill #{locals.profile.shopping_list.length}
+        .list-group
+          each i in locals.profile.shopping_list
+            a.list-group-item.list-group-item-action(href='#', data-id=i.id) #{i.text}
+    .row.py-3
+      button.btn.btn-danger.remove-items(type='button') Remove selected items from list
+  else 
+    p There's nothing to buy!

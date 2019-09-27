@@ -19,10 +19,11 @@ html(lang='en')
           a.nav-item.nav-link.active(href='/')
             | Home 
             span.sr-only (current)
-          a.nav-item.nav-link(href='/cookbook/recipes') Recipes
-          a.nav-item.nav-link(href='/cookbook/recipe/create') Add Recipe
-          a.nav-item.nav-link(href='/cookbook/recipe/import') Import Recipe
+          a.nav-item.nav-link(href='/recipe/all') Recipes
           if locals.profile
+            a.nav-item.nav-link(href='/recipe/create') Add Recipe
+            a.nav-item.nav-link(href='/recipe/import') Import Recipe
+            a.nav-item.nav-link(href='/user') Shopping List
             a.nav-item.nav-link(href=locals.logout) Logout
           else
             a.nav-item.nav-link(href=locals.login) Login

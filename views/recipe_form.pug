@@ -24,7 +24,7 @@ block content
       textarea#description.form-control(placeholder='Description', rows='3' name='description')=(undefined===recipe ? '' : recipe.description)
     .form-group
       label(for='ingredients') Ingredients:
-      textarea#ingredients.form-control(placeholder='Ingredients', rows='5' name='ingredients' required='true')=(undefined===recipe ? '' : recipe.ingredients.join('\n'))
+      textarea#ingredients.form-control(placeholder='Ingredients', rows='5' name='ingredients' required='true')=(undefined===recipe ? '' : recipe.ingredients.map(i => i.text).join('\n'))
     .form-group
       label(for='method') Method:
       textarea#method.form-control(placeholder='Method', rows='5' name='method', required='true')=(undefined===recipe ? '' : recipe.method.join('\n'))

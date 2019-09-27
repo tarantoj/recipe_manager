@@ -1,22 +1,27 @@
 const mongoose = require('mongoose');
 
-const ingredientSchema = require('./ingredient');
+const List = require('./list');
 
 const recipeSchema = mongoose.Schema({
   title: { type: String, required: true, max: 100 },
   author: String,
   description: String,
   method: { type: [String], required: true },
-  ingredients: [{ type: ingredientSchema, required: true }],
+  ingredients: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'List',
+    required: true,
+  },
   serves: Number,
   prepTime: Number,
   cookTime: Number,
+  image: String,
 });
 
 recipeSchema
   .virtual('url')
   .get(function url() {
-    return `/cookbook/recipe/${this.id}`;
+    return `/recipe/${this.id}`;
   });
 
 recipeSchema
@@ -24,5 +29,9 @@ recipeSchema
   .get(function totalTime() {
     return (this.prepTime + this.cookTime);
   });
+
+recipeSchema.pre('remove', function deleteIngredients(done) {
+  List.findOneAndDelete(this.ingredients).then(done);
+});
 
 module.exports = mongoose.model('Recipe', recipeSchema);

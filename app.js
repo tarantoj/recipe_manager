@@ -9,8 +9,11 @@ const sassMiddleware = require('node-sass-middleware');
 const passport = require('passport');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+const dotenv = require('dotenv');
+
 if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
+  dotenv.config();
 }
 
 require('./models/db');
@@ -50,7 +53,7 @@ app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser('super-secret')); // change secret
 app.use(sassMiddleware({
   src: path.join(__dirname, 'public'),
@@ -61,15 +64,16 @@ app.use(sassMiddleware({
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', userRouter);
-app.use('/cookbook', recipeRouter);
+app.use('/user', userRouter);
+app.use('/recipe', recipeRouter);
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
   next(createError(404));
 });
 
 // error handler
-app.use((err, req, res, next) => {
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, _next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

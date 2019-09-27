@@ -1,13 +1,34 @@
-function deleteRecipe(id) {
-  if (confirm('Are you sure you want to delete this recipe?')) {
-    $.post(`/cookbook/recipe/${id}/delete`, { id }, (data, status) => {
-      window.location.assign('/cookbook/recipes');
-    });
-  }
-}
-
-function addRecipe(id) {
-  $.post(`/cookbook/recipe/${id}/add`, { id }, (data, status) => {
-    alert("Recipe saved");
+$(document).ready(() => {
+  $('a.list-group-item').click(function toggleSelected() {
+    $(this).toggleClass('list-group-item-success');
   });
-}
+
+  $('#add').click(() => {
+    const toAdd = $("[name='ingredient']")
+      .filter(function isNotSelected() {
+        return !$(this).hasClass('list-group-item-success');
+      })
+      .map(function getData() {
+        return $(this).data();
+      })
+      .get();
+
+    // eslint-disable-next-line jquery/no-ajax
+    $.post('/user/list/add', { toAdd }, (_data, status) => {
+      if (status === 'success') window.location.href = '/user';
+    });
+  });
+
+  $("input[name='serves']").on('change', function modifyServes() {
+    const oldServes = parseFloat($(this).attr('original'));
+    const newServes = parseFloat(($(this).val()));
+    const serveMultiplier = newServes / oldServes;
+    const num = /^\d+(?:\.\d+)?$/;
+    $("[name='ingredient']").each(function swapQuantity() {
+      const i = $(this);
+      if (i.data('quantity')) {
+        i.text(i.text().replace(num, parseFloat((i.data('quantity')) * serveMultiplier).toString()));
+      }
+    });
+  });
+});

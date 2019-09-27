@@ -1,0 +1,21 @@
+extends layout
+
+block content
+  .py-1.text-center
+  h2.text-center Hi, #{locals.profile.display_name}
+  p.lead.text-center Here is everything on your shopping lists
+  if lists.length !== 0
+    .row
+      each list in lists
+        .col
+          h4.d-flex.justify-content-between.align-items-center
+            span.text-muted #{list.name}
+            span.badge.badge-secondary.badge-pill #{list.items.length}
+          if list.items.length !== 0
+            .list-group
+              each i in list
+                a.list-group-item.list-group-item-action(href='#', data-id=i.id) #{i.text}
+    .row.py-3
+      button.btn.btn-danger.remove-items(type='button') Remove selected items from list
+  else 
+    p There's nothing to buy!

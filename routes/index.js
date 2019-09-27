@@ -4,7 +4,8 @@ const router = express.Router();
 
 /* GET home page. */
 router.get('/', (_req, res) => {
-  res.redirect('/cookbook');
+  if (res.locals.profile) res.redirect('/user');
+  else res.redirect('/recipe');
 });
 
 module.exports = router;

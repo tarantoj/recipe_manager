@@ -4,39 +4,46 @@ block append scripts
   script(src='/javascript/recipe_detail.js')
 
 block content
-  h1.text-center #{recipe.title}
-  if recipe.author
-    p.text-center #[em #{recipe.author}]
-  else
-    p.text-center #[em Unknown Author]
-  p #{recipe.description}
+  .row.m-3
+    .col.text-center
+      h2 #{recipe.title}
+      if recipe.author
+        p.font-italic #{recipe.author}
+      else
+        p.font-italic Unknown Author
+      if recipe.description
+        p #{recipe.description}
+
 
   .row
-    .col
-      .card
-        .card-body
-          h5.card-title Ingredients
-          h6.card-subtitle.mb-2.text-muted Check off the ingredients you have
-          each i in recipe.ingredients
-            .form-check.mb-2
-              input#check.form-check-input(type='checkbox', value='')
-              label.form-check-label(for=i.text)
-              | #{i.text}
-          .input-group
-            input.form-control(type='number', name='serves' value=(undefined===recipe ? 4 : recipe.serves))
-            .input-group-append
-              span#basic-addon2.input-group-text Serves
+    .col-md-6
+      h3 Ingredients
+      p Select any ingredients you already have
+      .list-group(id='ingredients')
+        each i in recipe.ingredients.items
+          a.list-group-item.list-group-item-action(
+            data-id=i.id,
+            data-quantity=i.quantity,
+            data-unit=i.unit,
+            data-ingredient=i.ingredient,
+            name='ingredient') #{i.text}
+      .input-group.mt-2
+        input.form-control(
+          type='number',
+          name='serves',
+          value=(undefined===recipe ? 4 : recipe.serves)
+          original=(undefined===recipe ? 4 : recipe.serves)
+        )
+        .input-group-append
+          span#basic-addon2.input-group-text Serves
 
-    .col
-      .card
-        .card-body
-          h5.card-title Method
-          ul.list-group.list-group-flush
-            each i in recipe.method
-              li.list-group-item= i
-  .row
-    .btn-group(role='group')
-      a.btn.btn-outline-primary(role='button' onclick=`addRecipe('${recipe.id}')`) Save
-      a.btn.btn-outline-success(role='button' href='#') Cook
-      a.btn.btn-outline-secondary(href=`/${recipe.id}/update`) Edit
-      a.btn.btn-outline-danger(role='button', onclick="deleteRecipe('" + recipe.id + "')" id=recipe.id) Delete
+    .col-md-6
+      h3 Method
+      ol.list-group(id='method')
+        each s in recipe.method
+          li.list-group-item= s
+  if locals.profile
+    .row.m-4
+      button.btn.btn-primary.m-1(type='button' id='add') Add to shopping list
+      a.btn.btn-secondary.m-1(role='button' href=`/cookbook/update/${recipe.id}`) Edit recipe
+      button.btn.btn-danger.m-1(type='button' href=`/cookbook/`) Delete recipe

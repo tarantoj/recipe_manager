@@ -9,11 +9,9 @@ const sassMiddleware = require('node-sass-middleware');
 const passport = require('passport');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-const dotenv = require('dotenv');
-
 if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
+  // eslint-disable-next-line global-require,import/no-extraneous-dependencies
+  require('dotenv').config();
 }
 
 require('./models/db');

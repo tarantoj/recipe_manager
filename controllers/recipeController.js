@@ -4,7 +4,10 @@ const {
   sanitizeBody,
 } = require('express-validator');
 
+const async = require('async');
+
 const Recipe = require('../models/recipe');
+const User = require('../models/user');
 const List = require('../models/list');
 const woolworths = require('../lib/woolworths');
 const oauth2 = require('../lib/oauth2');
@@ -12,7 +15,9 @@ const oauth2 = require('../lib/oauth2');
 exports.index = (req, res, next) => {
   Recipe.countDocuments({}, (err, count) => {
     if (err) next(err);
-    res.render('index', { title: 'Home', count });
+    else {
+      res.render('index', { title: 'Home', count });
+    }
   });
 };
 
@@ -21,19 +26,37 @@ exports.recipe_list = (req, res, next) => {
     .find({}, 'title author')
     .exec((err, recipes) => {
       if (err) next(err);
-      res.render('recipe_list', { title: 'Recipe List', recipes });
+      else {
+        res.render('recipe_list', { title: 'Recipe List', recipes });
+      }
     });
 };
 
 exports.recipe_detail = (req, res, next) => {
-  Recipe.findById(req.params.id).populate('ingredients').exec((err, recipe) => {
+  async.parallel({
+    recipe: function recipe(done) {
+      Recipe
+        .findById(req.params.id)
+        .populate('ingredients')
+        .exec(done);
+    },
+    user: function user(done) {
+      if (res.locals.profile) {
+        User
+          .findById(res.locals.profile.id)
+          .populate('lists')
+          .exec(done);
+      } else done(null, null);
+    },
+  }, (err, results) => {
     if (err) next(err);
-    if (recipe == null) {
-      const error = new Error('Recipe not found');
-      error.status = 404;
-      next(error);
+    else {
+      res.render('recipe_detail', {
+        title: results.recipe.title,
+        recipe: results.recipe,
+        user: results.user,
+      });
     }
-    res.render('recipe_detail', { title: `${recipe.title}`, recipe });
   });
 };
 
@@ -60,6 +83,7 @@ function convertToArray(input) {
 
 exports.recipe_create_post = [
   oauth2.required,
+
   (req, res, next) => {
     req.body.ingredients = convertToArray(req.body.ingredients);
     next();
@@ -70,10 +94,6 @@ exports.recipe_create_post = [
   },
 
   body('title', 'Recipe title required').isLength({ min: 1 }).trim(),
-
-  sanitizeBody('*').escape(),
-  sanitizeBody('method').escape(),
-  sanitizeBody('ingredients').escape(),
 
   (req, res, next) => {
     const errors = validationResult(req);
@@ -109,9 +129,11 @@ exports.recipe_create_post = [
 exports.recipe_delete_post = [
   oauth2.required,
   (req, res, next) => {
-    Recipe.deleteOne({ _id: req.body.id }, (err) => {
+    Recipe.findByIdAndDelete(req.body.id, (err) => {
       if (err) next(err);
-      res.redirect('/recipe');
+      else {
+        res.redirect('/recipe');
+      }
     });
   },
 ];
@@ -124,12 +146,13 @@ exports.recipe_update_get = [
       .populate('ingredients')
       .exec((err, recipe) => {
         if (err) next(err);
-        if (recipe == null) {
+        else if (recipe == null) {
           const error = new Error('Recipe not found');
           error.status = 404;
           next(error);
+        } else {
+          res.render('recipe_form', { title: `Edit ${recipe.title}`, recipe });
         }
-        res.render('recipe_form', { title: `Edit ${recipe.title}`, recipe });
       });
   },
 ];
@@ -159,17 +182,18 @@ exports.recipe_update_post = [
       .populate('ingredients')
       .exec((err, recipe) => {
         if (err) next(err);
+        else {
+          recipe.title = req.body.title;
+          recipe.author = req.body.author;
+          recipe.method = req.body.method;
+          recipe.ingredients.items = req.body.ingredients.map((i) => ({ originalText: i }));
+          recipe.serves = req.body.serves;
+          recipe.description = req.body.description;
+          recipe.prepTime = req.body.prepTime;
+          recipe.cookTime = req.body.cookTime;
 
-        recipe.title = req.body.title;
-        recipe.author = req.body.author;
-        recipe.method = req.body.method;
-        recipe.ingredients.items = req.body.ingredients.map((i) => ({ originalText: i }));
-        recipe.serves = req.body.serves;
-        recipe.description = req.body.description;
-        recipe.prepTime = req.body.prepTime;
-        recipe.cookTime = req.body.cookTime;
-
-        recipe.save((_saveErr, result) => res.redirect(result.url));
+          recipe.save((_saveErr, result) => res.redirect(result.url));
+        }
       });
   },
 ];
@@ -193,7 +217,9 @@ exports.recipe_import_post = [
     req.recipe.ingredients = ingredientList;
     Recipe.create(req.recipe, (err, recipe) => {
       if (err) next(err);
-      res.redirect(recipe.url);
+      else {
+        res.redirect(recipe.url);
+      }
     });
   },
 ];

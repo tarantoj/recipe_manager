@@ -28,7 +28,7 @@ block content
     .form-group
       label(for='method') Method:
       textarea#method.form-control(placeholder='Method', rows='5' name='method', required='true')=(undefined===recipe ? '' : recipe.method.join('\n'))
-    button.btn.btn-primary(type='submit') Submit
+    button.btn.btn-primary(type='submit') Save
 
   if errors 
     ul

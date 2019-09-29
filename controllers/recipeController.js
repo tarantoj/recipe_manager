@@ -84,10 +84,6 @@ function convertToArray(input) {
 exports.recipe_create_post = [
   oauth2.required,
 
-  sanitizeBody('*').escape(),
-  sanitizeBody('method').escape(),
-  sanitizeBody('ingredients').escape(),
-
   (req, res, next) => {
     req.body.ingredients = convertToArray(req.body.ingredients);
     next();
@@ -133,7 +129,7 @@ exports.recipe_create_post = [
 exports.recipe_delete_post = [
   oauth2.required,
   (req, res, next) => {
-    Recipe.deleteOne({ _id: req.body.id }, (err) => {
+    Recipe.findByIdAndDelete(req.body.id, (err) => {
       if (err) next(err);
       else {
         res.redirect('/recipe');

@@ -1,4 +1,3 @@
-const createError = require('http-errors');
 const { body, validationResult, query } = require('express-validator');
 
 const User = require('../models/user');
@@ -27,8 +26,7 @@ exports.removeFromList = [
     .not().isEmpty(),
   body('listId')
     .not().isEmpty()
-    .trim()
-    .escape(),
+    .trim(),
   (req, res, next) => {
     const { toRemove, listId } = req.body;
     const errors = validationResult(req);
@@ -55,8 +53,7 @@ exports.addToList = [
     .not().isEmpty(),
   body('listId')
     .not().isEmpty()
-    .trim()
-    .escape(),
+    .trim(),
   (req, res, next) => {
     const { toAdd, listId } = req.body;
     const errors = validationResult(req);
@@ -75,8 +72,7 @@ exports.createList = [
   oauth2.required,
   body('name')
     .not().isEmpty()
-    .trim()
-    .escape(),
+    .trim(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) next(errors);
@@ -128,7 +124,10 @@ exports.removeList = [
           u.lists.pull(req.body.listId);
           u.save();
         });
-        res.redirect('/user');
+        List.findByIdAndDelete(req.body.listId).exec((listErr) => {
+          if (listErr) next(listErr);
+          else res.redirect('/user');
+        });
       });
   },
 ];
@@ -139,14 +138,12 @@ exports.searchUsers = [
   query('name')
     .not().isEmpty()
     .isAlpha()
-    .trim()
-    .escape(),
+    .trim(),
 
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) next(errors);
     else {
-
       User
         .find({
           $text: {
@@ -175,8 +172,7 @@ exports.addSingleToList = [
   body('originalText')
     .not().isEmpty()
     .isAlpha()
-    .trim()
-    .escape(),
+    .trim(),
   body('listId')
     .not().isEmpty(),
 

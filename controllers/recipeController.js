@@ -83,6 +83,11 @@ function convertToArray(input) {
 
 exports.recipe_create_post = [
   oauth2.required,
+
+  sanitizeBody('*').escape(),
+  sanitizeBody('method').escape(),
+  sanitizeBody('ingredients').escape(),
+
   (req, res, next) => {
     req.body.ingredients = convertToArray(req.body.ingredients);
     next();
@@ -93,10 +98,6 @@ exports.recipe_create_post = [
   },
 
   body('title', 'Recipe title required').isLength({ min: 1 }).trim(),
-
-  sanitizeBody('*').escape(),
-  sanitizeBody('method').escape(),
-  sanitizeBody('ingredients').escape(),
 
   (req, res, next) => {
     const errors = validationResult(req);

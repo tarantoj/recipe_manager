@@ -1,5 +1,5 @@
 const createError = require('http-errors');
-const { body, validationResult } = require('express-validator');
+const { body, validationResult, query } = require('express-validator');
 
 const User = require('../models/user');
 const List = require('../models/list');
@@ -102,7 +102,7 @@ exports.shareList = [
         if (err) next(err);
         user.lists.push(req.body.listId);
         user.save();
-        res.redirect('/user');
+        res.sendStatus(200);
       });
   },
 ];
@@ -123,5 +123,65 @@ exports.removeList = [
         });
         res.redirect('/user');
       });
+  },
+];
+
+exports.searchUsers = [
+  oauth2.required,
+
+  query('name')
+    .not().isEmpty()
+    .isAlpha()
+    .trim()
+    .escape(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) next(errors);
+
+    User
+      .find({
+        $text: {
+          $search: req.query.name,
+        },
+      })
+      .exec((err, users) => {
+        if (err) next(err);
+        const filteredUsers = users
+          .filter((user) => (user.id !== res.locals.profile.id))
+          .map((user) => ({
+            display_name: user.display_name,
+            id: user.id,
+          }));
+        res.render('user_results', { users: filteredUsers });
+      });
+  },
+];
+
+exports.addSingleToList = [
+  oauth2.required,
+
+  body('originalText')
+    .not().isEmpty()
+    .isAlpha()
+    .trim()
+    .escape(),
+  body('listId')
+    .not().isEmpty(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) next(errors);
+    else {
+      List.findById(req.body.listId).exec((err, list) => {
+        if (err) next(err);
+        else {
+          list.addSingle(req.body.originalText, (addErr) => {
+            if (addErr) next(err);
+            else res.redirect('/user');
+          });
+        }
+      });
+    }
   },
 ];

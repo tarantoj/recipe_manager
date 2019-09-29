@@ -14,6 +14,7 @@ $(document).ready(() => {
       })
       .get();
 
+    // eslint-disable-next-line jquery/no-ajax
     $.post('/user/list/add', { toAdd, listId }, (_data, status) => {
       if (status === 'success') window.location.href = '/user';
     });

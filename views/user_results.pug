@@ -1,0 +1,6 @@
+ul.list-group.list-group-flush
+  each user in users
+    li.list-group-item #{user.display_name}
+      button.btn.btn-outline-primary.btn-sm.float-right(type="button", data-userid=user.id, name="shareListButton") Share
+  else
+    li.list-group-item No user's found!

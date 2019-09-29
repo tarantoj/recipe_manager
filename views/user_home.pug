@@ -18,8 +18,8 @@ block content
                 button.btn.btn-outline-secondary.dropdown-toggle.dropdown-toggle-split.btn-sm(type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false")
                   span.sr-only Toggle dropdown
                 .dropdown-menu
-                  button.dropdown-item(type="button") Share
-                  button.dropdown-item(type="button") Edit
+                  button.dropdown-item(type="button", data-toggle="modal", data-target="#addItemModal", data-listId=list.id) Add
+                  button.dropdown-item(type="button", data-toggle="modal", data-target="#shareListModal", data-listId=list.id) Share
                   button.dropdown-item(type="button", data-toggle="modal", data-target="#deleteListModal", data-listId=list.id, data-listName=list.name) Delete
             ul.list-group
               each item in list.items
@@ -35,6 +35,7 @@ block content
   .row
     .col
       button.btn.btn-primary(type='button', data-toggle='modal', data-target='#createListModal') Create List
+
   #createListModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
     .modal-dialog.modal-dialog-centered(role='document')
       .modal-content
@@ -50,6 +51,7 @@ block content
           .modal-footer
             button.btn.btn-secondary(type='button', data-dismiss='modal') Close
             button.btn.btn-primary(type='submit') Create
+
   #deleteListModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
     .modal-dialog.modal-dialog-centered(role='document')
       .modal-content
@@ -64,3 +66,35 @@ block content
           .modal-footer
             button.btn.btn-secondary(type='button', data-dismiss='modal') Close
             button.btn.btn-danger(type='submit') Delete
+
+  #shareListModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+    .modal-dialog.modal-dialog-centered(role='document')
+      .modal-content
+          .modal-header
+            h5#exampleModalLabel.modal-title Share a list
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            form(onsubmit="return false;")
+              .input-group
+                input#searchUsers.form-control(type='text' name='name' required='true', placeholder="Search users by name or email")
+                .input-group-append
+                  button.btn.btn-outline-secondary(type="submit", id='searchUserButton') Search
+            .content(id='search-results')
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+
+  #addItemModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+    .modal-dialog.modal-dialog-centered(role='document')
+      .modal-content
+        form(action="/user/list/add/single", method="post")
+          .modal-header
+            h5#exampleModalLabel.modal-title Add an item
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            input#addItemListId.form-control(type='text', name="listId" value="" required="true" hidden)
+            input#addItem.form-control(type='text', name="originalText", required="true",placeholder="Your item")
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+            button.btn.btn-primary(type='submit') Add

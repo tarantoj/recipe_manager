@@ -30,7 +30,7 @@ const listSchema = mongoose.Schema({
 
 listSchema.virtual('url').get(function url() {
   return `/list/${this.id}`;
-})
+});
 
 listSchema.methods.addItems = function addItems(toAdd, done) {
   let combined = this.items.concat(toAdd);
@@ -41,6 +41,12 @@ listSchema.methods.addItems = function addItems(toAdd, done) {
   }));
   this.items = ingredientParser.combine(combined);
   this.save(done);
+};
+
+listSchema.methods.addSingle = function addSingle(originalText, done) {
+  const parsed = [];
+  parsed.push(ingredientParser.parse(originalText));
+  this.addItems(parsed, done);
 };
 
 listSchema.methods.removeItems = function removeItems(toRemove, done) {

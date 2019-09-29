@@ -15,7 +15,9 @@ const oauth2 = require('../lib/oauth2');
 exports.index = (req, res, next) => {
   Recipe.countDocuments({}, (err, count) => {
     if (err) next(err);
-    res.render('index', { title: 'Home', count });
+    else {
+      res.render('index', { title: 'Home', count });
+    }
   });
 };
 
@@ -24,7 +26,9 @@ exports.recipe_list = (req, res, next) => {
     .find({}, 'title author')
     .exec((err, recipes) => {
       if (err) next(err);
-      res.render('recipe_list', { title: 'Recipe List', recipes });
+      else {
+        res.render('recipe_list', { title: 'Recipe List', recipes });
+      }
     });
 };
 
@@ -46,11 +50,13 @@ exports.recipe_detail = (req, res, next) => {
     },
   }, (err, results) => {
     if (err) next(err);
-    res.render('recipe_detail', {
-      title: results.recipe.title,
-      recipe: results.recipe,
-      user: results.user,
-    });
+    else {
+      res.render('recipe_detail', {
+        title: results.recipe.title,
+        recipe: results.recipe,
+        user: results.user,
+      });
+    }
   });
 };
 
@@ -128,7 +134,9 @@ exports.recipe_delete_post = [
   (req, res, next) => {
     Recipe.deleteOne({ _id: req.body.id }, (err) => {
       if (err) next(err);
-      res.redirect('/recipe');
+      else {
+        res.redirect('/recipe');
+      }
     });
   },
 ];
@@ -141,12 +149,13 @@ exports.recipe_update_get = [
       .populate('ingredients')
       .exec((err, recipe) => {
         if (err) next(err);
-        if (recipe == null) {
+        else if (recipe == null) {
           const error = new Error('Recipe not found');
           error.status = 404;
           next(error);
+        } else {
+          res.render('recipe_form', { title: `Edit ${recipe.title}`, recipe });
         }
-        res.render('recipe_form', { title: `Edit ${recipe.title}`, recipe });
       });
   },
 ];
@@ -176,17 +185,18 @@ exports.recipe_update_post = [
       .populate('ingredients')
       .exec((err, recipe) => {
         if (err) next(err);
+        else {
+          recipe.title = req.body.title;
+          recipe.author = req.body.author;
+          recipe.method = req.body.method;
+          recipe.ingredients.items = req.body.ingredients.map((i) => ({ originalText: i }));
+          recipe.serves = req.body.serves;
+          recipe.description = req.body.description;
+          recipe.prepTime = req.body.prepTime;
+          recipe.cookTime = req.body.cookTime;
 
-        recipe.title = req.body.title;
-        recipe.author = req.body.author;
-        recipe.method = req.body.method;
-        recipe.ingredients.items = req.body.ingredients.map((i) => ({ originalText: i }));
-        recipe.serves = req.body.serves;
-        recipe.description = req.body.description;
-        recipe.prepTime = req.body.prepTime;
-        recipe.cookTime = req.body.cookTime;
-
-        recipe.save((_saveErr, result) => res.redirect(result.url));
+          recipe.save((_saveErr, result) => res.redirect(result.url));
+        }
       });
   },
 ];
@@ -210,7 +220,9 @@ exports.recipe_import_post = [
     req.recipe.ingredients = ingredientList;
     Recipe.create(req.recipe, (err, recipe) => {
       if (err) next(err);
-      res.redirect(recipe.url);
+      else {
+        res.redirect(recipe.url);
+      }
     });
   },
 ];

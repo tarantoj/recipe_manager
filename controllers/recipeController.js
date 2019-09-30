@@ -192,7 +192,11 @@ exports.recipe_update_post = [
           recipe.prepTime = req.body.prepTime;
           recipe.cookTime = req.body.cookTime;
 
-          recipe.save((_saveErr, result) => res.redirect(result.url));
+          recipe.ingredients.save();
+
+          recipe.save((_saveErr, result) => {
+            res.redirect(result.url);
+          });
         }
       });
   },

@@ -15,16 +15,37 @@ block content
       input#serves.form-control(type='number', placeholder='4' name='serves' required='true' value=(undefined===recipe ? 4 : recipe.serves) )
     .form-group
       label(for='prepTime') Preparation Time:
-      input#serves.form-control(type='number', placeholder='in minutes ' name='prepTime' value=(undefined===recipe ? null : recipe.prepTime) )
+      .input-group.mb-3
+        input#prepTime.form-control(type='number' name='prepTime' value=(undefined===recipe ? null : recipe.prepTime) )
+        .input-group-append
+          span.input-group-text minutes
     .form-group
       label(for='cookTime') Cooking Time:
-      input#serves.form-control(type='number', placeholder='in minutes' name='cookTime' value=(undefined===recipe ? null : recipe.cookTime) )    
-    .form-group
+      .input-group.mb-3
+        input#cookTime.form-control(type='number' name='cookTime' value=(undefined===recipe ? null : recipe.cookTime) )
+        .input-group-append
+          span.input-group-text minutes
       label(for='description') Description:
       textarea#description.form-control(placeholder='Description', rows='3' name='description')=(undefined===recipe ? '' : recipe.description)
     .form-group
       label(for='ingredients') Ingredients:
-      textarea#ingredients.form-control(placeholder='Ingredients', rows='5' name='ingredients' required='true')=(undefined===recipe ? '' : recipe.ingredients.items.map(i => i.text).join('\n'))
+      if recipe
+        each ing, index in recipe.ingredients.items
+          .input-group.mb-2
+            input.form-control(type='text' name='ingredients[]' placeholder='Add an ingredient' value=ing.text)
+            .input-group-append
+              if index === recipe.ingredients.items.length - 1
+                button.btn.btn-success.btn-add
+                  span +
+              else
+                button.btn.btn-danger.btn-remove
+                  span -
+      else
+        .input-group
+          input.form-control(type='text' name='ingredients[]' placeholder='Add an ingredient')
+          .input-group-append
+            button.btn.btn-success.btn-add
+              span +
     .form-group
       label(for='method') Method:
       textarea#method.form-control(placeholder='Method', rows='5' name='method', required='true')=(undefined===recipe ? '' : recipe.method.join('\n'))

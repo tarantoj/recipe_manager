@@ -16,6 +16,7 @@ const recipeSchema = mongoose.Schema({
   prepTime: Number,
   cookTime: Number,
   image: String,
+  notes: String,
 });
 
 recipeSchema

@@ -5,11 +5,13 @@ const {
 } = require('express-validator');
 
 const async = require('async');
+const url = require('url');
 
 const Recipe = require('../models/recipe');
 const User = require('../models/user');
 const List = require('../models/list');
 const woolworths = require('../lib/woolworths');
+const sbs = require('../lib/sbs');
 const oauth2 = require('../lib/oauth2');
 
 exports.index = (req, res, next) => {
@@ -209,9 +211,17 @@ exports.recipe_import_get = [
   },
 ];
 
+const importer = (req, res, next) => {
+  const { hostname } = url.parse(req.body.url);
+  console.log(hostname);
+
+  if (hostname.includes('sbs.com.au')) sbs.importRecipe(req, res, next);
+  else if (hostname.includes('woolworths.com.au')) woolworths.importRecipe(req, res, next);
+  else next('Not a supported site');
+};
 exports.recipe_import_post = [
   oauth2.required,
-  woolworths.importRecipe,
+  importer,
   (req, res, next) => {
     const ingredientList = new List({
       name: 'ingredients',
@@ -219,6 +229,7 @@ exports.recipe_import_post = [
     });
     ingredientList.save();
     req.recipe.ingredients = ingredientList;
+    console.log(req.recipe);
     Recipe.create(req.recipe, (err, recipe) => {
       if (err) next(err);
       else {
